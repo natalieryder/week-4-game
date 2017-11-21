@@ -85,17 +85,73 @@ $(document).ready(function(){
 		attack: function() {
 			var thisGame = this; //not sure why this doesn't work here
 			if (game.gameStage === 2) {
-				console.log("you attacked");
 				var youHit = game.playerCharacter.attack;
 				var theyHit = game.enemyFighting.counterAttack;
 				game.enemyFighting.hp -= youHit;
 				game.playerCharacter.hp -= theyHit;
 				//increase the attack power
 				game.playerCharacter.attack += game.playerCharacter.baseAttack;
-				game.enemies[game.enemyFighting.id] = game.enemyFighting;
+				// game.enemies[game.enemyFighting.id] = game.enemyFighting;
+				if (game.enemyFighting.hp <= 0) {
+					console.log("you won");
+					$("#" + game.enemyFighting.id).hide();
+					game.gameStage = 1;
+				};
+				if (game.playerCharacter.hp <= 0) {
+					console.log("you lose");
+					game.reset();
+				}
 				updateStats(game.charactersArray);
+
 			}
+		},
+		reset: function() {
+			game.charactersArray=[
+				{
+					name: "Ginny Weasley",
+					hp: 120,
+					attack: 8,
+					baseAttack: 8,
+					counterAttack: 10,
+					image: "./assets/images/ginny.jpg",
+					id: 0
+				},
+				{
+					name: "Neville Longbottom",
+					hp: 150,
+					attack: 20,
+					baseAttack: 20,
+					counterAttack: 20,
+					image: "./assets/images/neville.jpg",
+					id: 1
+				},
+				{
+					name: "Luna Lovegood",
+					hp: 180,
+					attack: 25,
+					baseAttack: 25,
+					counterAttack: 25,
+					image: "./assets/images/luna.jpg",
+					id: 2
+				},
+				{
+					name: "Colin Creevy",
+					hp: 100,
+					attack: 5,
+					baseAttack: 5,
+					counterAttack: 5,
+					image: "./assets/images/colin.jpg",
+					id: 3
+				}
+			];
+			game.gameStage = 0;
+			game.playerCharacter = '';
+			game.enemies = [];
+			game.enemyFighting = '';
+			$(".character").removeClass("enemy fighting me");
+
 		}
+
 	};
 
 	// page functions
