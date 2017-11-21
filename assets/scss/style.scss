@@ -1,0 +1,27 @@
+$font: 'Barlow', sans-serif;
+
+html, body, * {
+	font-family: $font;
+
+}
+body {
+	background: #eee;
+		height: 100vh;
+}
+.player {
+	background: green;
+}
+.enemy {
+	order: 2;
+	bottom: 0;
+	border: 1px solid red;
+}
+.me {
+	border: 1px solid green;
+}
+.container {
+	height: 100%;
+}
+.fighting {
+	border: 3px solid red;
+}
