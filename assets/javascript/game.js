@@ -1,44 +1,11 @@
 $(document).ready(function(){
 	var game = {
-		characters: {
-			ginny: {
-				name: "Ginny Weasley",
-				hp: 120,
-				attack: 8,
-				counterAttack: 10,
-				image: "./assets/images/ginny.jpg",
-				id: 0
-			},
-			neville: {
-				name: "Neville Longbottom",
-				hp: 150,
-				attack: 20,
-				counterAttack: 20,
-				image: "./assets/images/neville.jpg",
-				id: 1
-			},
-			luna: {
-				name: "Luna Lovegood",
-				hp: 180,
-				attack: 25,
-				counterAttack: 25,
-				image: "./assets/images/luna.jpg",
-				id: 2
-			},
-			colin: {
-				name: "Colin Creevy",
-				hp: 100,
-				attack: 5,
-				counterAttack: 5,
-				image: "./assets/images/colin.jpg",
-				id: 3
-			}
-		},
 		charactersArray: [
 			{
 				name: "Ginny Weasley",
 				hp: 120,
 				attack: 8,
+				baseAttack: 8,
 				counterAttack: 10,
 				image: "./assets/images/ginny.jpg",
 				id: 0
@@ -47,6 +14,7 @@ $(document).ready(function(){
 				name: "Neville Longbottom",
 				hp: 150,
 				attack: 20,
+				baseAttack: 20,
 				counterAttack: 20,
 				image: "./assets/images/neville.jpg",
 				id: 1
@@ -55,6 +23,7 @@ $(document).ready(function(){
 				name: "Luna Lovegood",
 				hp: 180,
 				attack: 25,
+				baseAttack: 25,
 				counterAttack: 25,
 				image: "./assets/images/luna.jpg",
 				id: 2
@@ -63,6 +32,7 @@ $(document).ready(function(){
 				name: "Colin Creevy",
 				hp: 100,
 				attack: 5,
+				baseAttack: 5,
 				counterAttack: 5,
 				image: "./assets/images/colin.jpg",
 				id: 3
@@ -90,19 +60,20 @@ $(document).ready(function(){
 
 		selectCharacter: function(id) { //if characters is an array
 			// checks each character against the id of the one clicked and sorts them
-			console.log(id);
+			id = parseInt(id);
 			var thisGame = this;
+
 			$.each(this.charactersArray, function(index,value){
 				// for the charcter whose ID matches the clicked one, set to player character
-				console.log(index);
-
-				if (index == id) {
-					console.log("yes");
+				if (index === id) {
+					// to do: make this a new variable and not a reference to charactarsArray
 					thisGame.playerCharacter = thisGame.charactersArray[index];
+
 				} else { //set the rest as enemies
 					thisGame.enemies.push(thisGame.charactersArray[index]);
 				}
 			});
+
 			console.log("my char is " + this.playerCharacter.name);
 			console.log("my enemies are " + this.enemies[0].name + this.enemies[1].name + this.enemies[2].name);
 		},
@@ -110,6 +81,20 @@ $(document).ready(function(){
 		selectOpponent: function(id) {
 			this.enemyFighting = this.charactersArray[id];
 			console.log("i'm fighting " + this.enemyFighting.name);
+		},
+		attack: function() {
+			var thisGame = this; //not sure why this doesn't work here
+			if (game.gameStage === 2) {
+				console.log("you attacked");
+				var youHit = game.playerCharacter.attack;
+				var theyHit = game.enemyFighting.counterAttack;
+				game.enemyFighting.hp -= youHit;
+				game.playerCharacter.hp -= theyHit;
+				//increase the attack power
+				game.playerCharacter.attack += game.playerCharacter.baseAttack;
+				game.enemies[game.enemyFighting.id] = game.enemyFighting;
+				updateStats(game.charactersArray);
+			}
 		}
 	};
 
@@ -132,8 +117,10 @@ $(document).ready(function(){
 	}
 
 	function updateStats(array) {
-		$.each(array, function(index,value){
-			var charId = "#" + index;
+		console.log(array)
+		$.each(array, function(index, value){
+			
+			var charId = "#" + value.id;
 			$(charId).find(".hp").html(value.hp);
 			$(charId).find(".attack").html(value.attack);
 			$(charId).find(".counter-attack").html(value.counterAttack);
@@ -142,35 +129,26 @@ $(document).ready(function(){
 
 	function moveCharacters(id) {
 		id = parseInt(id);
-		// for each enemy, add class
+
 		$("#" + id).addClass("me");
 
 		var enemies = game.enemies;
-
-
-		// enemies index is different so it breaks here
-		// $.each(game.charactersArray, function(key, value) {
-		// 	if (key !== id) {
-		// 		$("#" + key).addClass("enemy");
-		// 	}
-		// });
-
+		// for each enemy, add class
 		$.each(enemies, function(key,value) {
-			console.log(value["id"]);
-			$("#" + value["id"]).addClass("enemy");
-		})
+			$("#" + value.id).addClass("enemy");
+		});
 	}
 
 	function stageOpponent(id) {
-		console.log("the id is" + game.charactersArray[id].id);
+		//add class to current opponent
 		$("#" + game.charactersArray[id].id).addClass("fighting");
 	}
 
 	function handleCharacterClick() {
 		var id = $(this).attr("id");
-		console.log(id + "clicked");
+
 		if (game.gameStage === 1) {
-			// make sure is not selected character
+			// to do : make sure is not selected character
 			game.selectOpponent(id);
 			stageOpponent(id);
 			game.gameStage = 2;
@@ -180,7 +158,7 @@ $(document).ready(function(){
 			game.selectCharacter(id);
 			moveCharacters(id);
 			game.gameStage = 1;
-		};
+		}
 	}
 
 	// events	
@@ -188,6 +166,7 @@ $(document).ready(function(){
 	initializeGame();
 
 	$(".character").click( handleCharacterClick );
+	$("#attack").click ( game.attack );
 
 });
 
