@@ -39,7 +39,7 @@ $(document).ready(function(){
 			}
 		],
 		gameStage: 0,
-		playerCharacter:'',
+		playerCharacter:{},
 		enemies: [],
 		enemyFighting:'',
 		
@@ -48,41 +48,50 @@ $(document).ready(function(){
 			// checks each character against the id of the one clicked and sorts them
 			id = parseInt(id);
 			var thisGame = this;
-
-			playerCharacterNew = $.map(thisGame.charactersArray, function( value, index ) {
-				if (index === id) {
-					
-					console.log("test");
-					console.log(thisGame.charactersArray[index]);
-					return thisGame.charactersArray[index];
-				}
+			var enemies = [];
+			var playerCharacterNew;
+			$.each(this.charactersArray, function(key,value){
+				if (key === id) {
+					playerCharacterNew = $.extend(true,{},thisGame.charactersArray[key]);
+				} else {
+					enemies.push($.extend(true,{},thisGame.charactersArray[key]));
+				};
 			});
-			enemies = $.map(thisGame.charactersArray, function( value, index ) {
-				if (index !== id) {
-					
-					console.log("test");
-					console.log(thisGame.charactersArray[index]);
-					return thisGame.charactersArray[index];
-				}
-			});
-			thisGame.playerCharacter = playerCharacterNew;
-			thisGame.enemies = enemies;
+			// playerCharacterNew = $.map(thisGame.charactersArray, function( value, index ) {
+			// 	if (index === id) {
+			// 		//map still returns a reference. using extend creates a clone
+			// 		return $.extend(true, {}, thisGame.charactersArray[index]);
+			// 	}
+			// });
+			// enemies = $.map(thisGame.charactersArray, function( value, index ) {
+			// 	if (index !== id) {
+			// 		return $.extend(true, {}, thisGame.charactersArray[index]);
+			// 	}
+			// });
 
-
-
-			// console.log("my char is " + this.playerCharacter.name);
-			console.log("my enemies are " + enemies[0].name + enemies[1].name + enemies[2].name);
+			this.playerCharacter = playerCharacterNew;
+			this.enemies = enemies;
 		},
 
 		selectOpponent: function(id) {
-			this.enemyFighting = this.charactersArray[id];
-			console.log("i'm fighting " + this.enemyFighting.name);
+			id = parseInt(id);
+			thisGame = this;
+			$.each(thisGame.enemies, function(index,value){
+				// console.log(key value);
+				if ( id === value.id) {
+					thisGame.enemyFighting = value;
+					console.log("i'm fighting " + thisGame.enemyFighting.name);
+				}
+			});
+			
 		},
 		attack: function() {
 			var thisGame = this; //not sure why this doesn't work here
 			if (game.gameStage === 2) {
 				var youHit = game.playerCharacter.attack;
 				var theyHit = game.enemyFighting.counterAttack;
+				console.log(youHit + " \ " + theyHit)
+				console.log(game.charactersArray);
 				game.enemyFighting.hp -= youHit;
 				game.playerCharacter.hp -= theyHit;
 				//increase the attack power
@@ -96,10 +105,10 @@ $(document).ready(function(){
 				if (game.playerCharacter.hp <= 0) {
 					console.log("you lose");
 					game.reset();
-				}
-				updateStats(game.charactersArray);
-
+				};
+				updateStats(game.enemies);
 			}
+
 		},
 		reset: function() {
 			game.charactersArray=[
@@ -167,7 +176,7 @@ $(document).ready(function(){
 	}
 
 	function updateStats(array) {
-		console.log(array)
+		// console.log(array)
 		$.each(array, function(index, value){
 			
 			var charId = "#" + value.id;
@@ -210,13 +219,15 @@ $(document).ready(function(){
 			game.gameStage = 1;
 		}
 	}
-
+	function handleAttack() {
+		game.attack();
+	}
 	// events	
 
 	initializeGame();
 
 	$(".character").click( handleCharacterClick );
-	$("#attack").click ( game.attack );
+	$("#attack").click( handleAttack );
 
 });
 
