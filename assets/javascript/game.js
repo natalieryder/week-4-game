@@ -91,7 +91,6 @@ $(document).ready(function(){
 				var youHit = game.playerCharacter.attack;
 				var theyHit = game.enemyFighting.counterAttack;
 				console.log(youHit + " \ " + theyHit)
-				console.log(game.charactersArray);
 				game.enemyFighting.hp -= youHit;
 				game.playerCharacter.hp -= theyHit;
 				//increase the attack power
@@ -107,6 +106,7 @@ $(document).ready(function(){
 					game.reset();
 				};
 				updateStats(game.enemies);
+				updateStats(game.playerCharacter);
 			}
 
 		},
@@ -175,15 +175,22 @@ $(document).ready(function(){
 		updateStats(game.charactersArray);
 	}
 
-	function updateStats(array) {
+	function updateStats(characters) {
 		// console.log(array)
-		$.each(array, function(index, value){
-			
-			var charId = "#" + value.id;
-			$(charId).find(".hp").html(value.hp);
-			$(charId).find(".attack").html(value.attack);
-			$(charId).find(".counter-attack").html(value.counterAttack);
-		});
+		function printStats(char) {
+			var charId = "#" + char.id;
+			$(charId).find(".hp").html(char.hp);
+			$(charId).find(".attack").html(char.attack);
+			$(charId).find(".counter-attack").html(char.counterAttack);
+		}
+
+		if (Array.isArray(characters)) {
+			$.each(characters, function(index, value){
+				printStats(value);
+			});
+		} else {
+			printStats(characters);
+		}
 	}
 
 	function moveCharacters(id) {
