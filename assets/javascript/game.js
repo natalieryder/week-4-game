@@ -44,38 +44,34 @@ $(document).ready(function(){
 		enemyFighting:'',
 		
 
-		selectCharacterNotArray: function(id) {
-			// checks each character against the id of the one clicked and sorts them
-			var thisGame = this;
-			$.each(this.characters, function(key,value){
-				if (key === id) {
-					thisGame.playerCharacter = thisGame.characters[key];
-				} else {
-					thisGame.enemies.push(thisGame.characters[key]);
-				}
-			});
-			console.log("my char is " + this.playerCharacter.name);
-			console.log("my enemies are " + this.enemies[0].name + this.enemies[1].name + this.enemies[2].name);
-		},
-
 		selectCharacter: function(id) { //if characters is an array
 			// checks each character against the id of the one clicked and sorts them
 			id = parseInt(id);
 			var thisGame = this;
 
-			$.each(this.charactersArray, function(index,value){
-				// for the charcter whose ID matches the clicked one, set to player character
+			playerCharacterNew = $.map(thisGame.charactersArray, function( value, index ) {
 				if (index === id) {
-					// to do: make this a new variable and not a reference to charactarsArray
-					thisGame.playerCharacter = thisGame.charactersArray[index];
-
-				} else { //set the rest as enemies
-					thisGame.enemies.push(thisGame.charactersArray[index]);
+					
+					console.log("test");
+					console.log(thisGame.charactersArray[index]);
+					return thisGame.charactersArray[index];
 				}
 			});
+			enemies = $.map(thisGame.charactersArray, function( value, index ) {
+				if (index !== id) {
+					
+					console.log("test");
+					console.log(thisGame.charactersArray[index]);
+					return thisGame.charactersArray[index];
+				}
+			});
+			thisGame.playerCharacter = playerCharacterNew;
+			thisGame.enemies = enemies;
 
-			console.log("my char is " + this.playerCharacter.name);
-			console.log("my enemies are " + this.enemies[0].name + this.enemies[1].name + this.enemies[2].name);
+
+
+			// console.log("my char is " + this.playerCharacter.name);
+			console.log("my enemies are " + enemies[0].name + enemies[1].name + enemies[2].name);
 		},
 
 		selectOpponent: function(id) {
@@ -153,8 +149,6 @@ $(document).ready(function(){
 		}
 
 	};
-
-	// page functions
 
 	function initializeGame() {
 		//for each character, create their block
