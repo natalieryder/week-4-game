@@ -8,20 +8,78 @@ body {
 	background: #eee;
 		height: 100vh;
 }
+.container {
+	padding: 30px;
+}
+.strong {
+	font-weight: bold;
+}
+h1 {
+	text-align: center;
+	margin-bottom: 30px;
+}
+#characters {
+	display: grid;
+	grid-auto-flow: row;
+	height:400px;
+	grid-template-columns: repeat(12, 8.3333%);
+ 	grid-template-rows: 45% 10% 45%;
+ 	align-content:center;
+}
+.character {
+	grid-column-end: span 3;
+	text-align: center;
+	align-self: center;
+	display: block;
+
+}
+.character img {
+	height: 100px;
+
+}
 .player {
 	background: green;
 }
 .enemy {
-	order: 2;
 	bottom: 0;
 	border: 1px solid red;
 }
 .me {
+	&:before {
+		content: "Me:";
+	}
+	grid-column: 2 / span 3;
+  	grid-row: 3 / span 1;
 	border: 1px solid green;
 }
 .container {
 	height: 100%;
 }
 .fighting {
-	border: 3px solid red;
+	&:before {
+		content: "Current opponent:";
+	}
+	grid-column: 9 / span 3;
+  	grid-row: 3 / span 1;
+}
+.defeated {
+	display: none;
+}
+#messages {
+	text-align: center;
+	grid-column: 5 / span 4;
+	grid-row: 3 / span 1;
+	justify-self: center;
+	align-self: center;
+}
+#reset {
+	display: none;
+	&.show {
+		display: inline-block;
+	}
+}
+#attack{
+	&.hide {
+		display: none;
+	}
 }

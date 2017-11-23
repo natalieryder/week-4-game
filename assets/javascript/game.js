@@ -4,9 +4,8 @@ $(document).ready(function(){
 			{
 				name: "Ginny Weasley",
 				hp: 120,
-				attack: 8,
-				baseAttack: 8,
-				counterAttack: 10,
+				attack: 15,
+				counterAttack: 8,
 				image: "./assets/images/ginny.jpg",
 				id: 0
 			},
@@ -14,8 +13,7 @@ $(document).ready(function(){
 				name: "Neville Longbottom",
 				hp: 150,
 				attack: 20,
-				baseAttack: 20,
-				counterAttack: 20,
+				counterAttack: 15,
 				image: "./assets/images/neville.jpg",
 				id: 1
 			},
@@ -23,16 +21,14 @@ $(document).ready(function(){
 				name: "Luna Lovegood",
 				hp: 180,
 				attack: 25,
-				baseAttack: 25,
-				counterAttack: 25,
+				counterAttack: 15,
 				image: "./assets/images/luna.jpg",
 				id: 2
 			},
 			{
 				name: "Colin Creevy",
 				hp: 100,
-				attack: 5,
-				baseAttack: 5,
+				attack: 10,
 				counterAttack: 5,
 				image: "./assets/images/colin.jpg",
 				id: 3
@@ -43,10 +39,9 @@ $(document).ready(function(){
 		enemies: [],
 		enemyFighting:'',
 		
-
-		selectCharacter: function(id) { //if characters is an array
+		selectCharacter: function(id) { 
 			// checks each character against the id of the one clicked and sorts them
-			id = parseInt(id);
+			// id = parseInt(id);
 			var thisGame = this;
 			var enemies = [];
 			var playerCharacterNew;
@@ -57,121 +52,91 @@ $(document).ready(function(){
 					enemies.push($.extend(true,{},thisGame.charactersArray[key]));
 				};
 			});
-			// playerCharacterNew = $.map(thisGame.charactersArray, function( value, index ) {
-			// 	if (index === id) {
-			// 		//map still returns a reference. using extend creates a clone
-			// 		return $.extend(true, {}, thisGame.charactersArray[index]);
-			// 	}
-			// });
-			// enemies = $.map(thisGame.charactersArray, function( value, index ) {
-			// 	if (index !== id) {
-			// 		return $.extend(true, {}, thisGame.charactersArray[index]);
-			// 	}
-			// });
 
 			this.playerCharacter = playerCharacterNew;
 			this.enemies = enemies;
 		},
 
 		selectOpponent: function(id) {
-			id = parseInt(id);
+			// id = parseInt(id);
 			thisGame = this;
+			
 			$.each(thisGame.enemies, function(index,value){
-				// console.log(key value);
+				
 				if ( id === value.id) {
 					thisGame.enemyFighting = value;
-					console.log("i'm fighting " + thisGame.enemyFighting.name);
 				}
 			});
-			
 		},
 		attack: function() {
 			var thisGame = this; //not sure why this doesn't work here
-			if (game.gameStage === 2) {
-				var youHit = game.playerCharacter.attack;
-				var theyHit = game.enemyFighting.counterAttack;
-				console.log(youHit + " \ " + theyHit)
-				game.enemyFighting.hp -= youHit;
-				game.playerCharacter.hp -= theyHit;
+			if (thisGame.gameStage === 2) {
+				var youHit = thisGame.playerCharacter.attack;
+				var theyHit = thisGame.enemyFighting.counterAttack;
+				thisGame.enemyFighting.hp -= youHit;
+				thisGame.playerCharacter.hp -= theyHit;
 				//increase the attack power
-				game.playerCharacter.attack += game.playerCharacter.baseAttack;
-				// game.enemies[game.enemyFighting.id] = game.enemyFighting;
-				if (game.enemyFighting.hp <= 0) {
-					console.log("you won");
-					$("#" + game.enemyFighting.id).hide();
-					game.gameStage = 1;
+				thisGame.playerCharacter.attack += thisGame.charactersArray[thisGame.playerCharacter.id].attack;
+				// thisGame.enemies[thisGame.enemyFighting.id] = thisGame.enemyFighting;
+				showMessage("Your hit " + thisGame.enemyFighting.name + " for -" + youHit + "<br>" + thisGame.enemyFighting.name + " hit you for -" + theyHit);
+				if (thisGame.enemyFighting.hp <= 0) {
+					this.win();
 				};
-				if (game.playerCharacter.hp <= 0) {
-					console.log("you lose");
-					game.reset();
-				};
-				updateStats(game.enemies);
-				updateStats(game.playerCharacter);
-			}
 
+				if (thisGame.playerCharacter.hp <= 0) {
+					this.lose();
+				};
+				updateStats(thisGame.enemies);
+				updateStats(thisGame.playerCharacter);
+			}
+		},
+		win: function() {
+
+			$("#" + game.enemyFighting.id).addClass("defeated").removeClass("fighting");
+			//if the character has health 0
+			var totalhp = 0;
+			$.each(game.enemies, function(key, value) {
+				if (value.hp < 0) {
+					value.hp = 0;
+				}
+				totalhp += value.hp;
+			});
+			
+			if (totalhp <= 0) {
+				showWinGame();
+			} else {
+				showWinBattle(this.enemyFighting.name);
+			}
+			game.gameStage = 1;
+		},
+		lose: function() {
+			console.log("you lose");
+			game.reset();
 		},
 		reset: function() {
-			game.charactersArray=[
-				{
-					name: "Ginny Weasley",
-					hp: 120,
-					attack: 8,
-					baseAttack: 8,
-					counterAttack: 10,
-					image: "./assets/images/ginny.jpg",
-					id: 0
-				},
-				{
-					name: "Neville Longbottom",
-					hp: 150,
-					attack: 20,
-					baseAttack: 20,
-					counterAttack: 20,
-					image: "./assets/images/neville.jpg",
-					id: 1
-				},
-				{
-					name: "Luna Lovegood",
-					hp: 180,
-					attack: 25,
-					baseAttack: 25,
-					counterAttack: 25,
-					image: "./assets/images/luna.jpg",
-					id: 2
-				},
-				{
-					name: "Colin Creevy",
-					hp: 100,
-					attack: 5,
-					baseAttack: 5,
-					counterAttack: 5,
-					image: "./assets/images/colin.jpg",
-					id: 3
-				}
-			];
 			game.gameStage = 0;
 			game.playerCharacter = '';
 			game.enemies = [];
 			game.enemyFighting = '';
-			$(".character").removeClass("enemy fighting me");
-
+			resetDisplay();
 		}
-
 	};
 
 	function initializeGame() {
 		//for each character, create their block
 		$.each(game.charactersArray, function(key,value){
-			var characterBlock = $("<div>").attr("id",key).addClass("col col-3 character");
+			$("#instructions").html("Choose a character");
+			var characterBlock = $("<div>").attr("id",key).addClass("character");
+			$("<p class='strong mb-0'>").html(value.name).appendTo(characterBlock);
 			$("<img>").attr("src",value.image).addClass("img-fluid").appendTo(characterBlock);
 			var stats = $("<ul>").addClass("stats");
-			var hp = $("<li>").addClass("hp");
-			var attack = $("<li>").addClass("attack");
-			var counter = $("<li>").addClass("counter-attack");
-			$(stats).append(hp).append(attack).append(counter).appendTo(characterBlock);
+			var hp = $("<li>").append("<span>").addClass("hp").prepend("Health: ");
+			var attack = $("<li>").append("<span>").addClass("attack").prepend("Attack: ");
+			var counter = $("<li>").append("<span>").addClass("counter-attack").prepend("Counter Attack: ");
+			// $(stats).append(hp).append(attack).append(counter).appendTo(characterBlock);
+			$(stats).append(hp).appendTo(characterBlock);
 			$(characterBlock).appendTo("#characters");
 		});
-
 		updateStats(game.charactersArray);
 	}
 
@@ -179,9 +144,9 @@ $(document).ready(function(){
 		// console.log(array)
 		function printStats(char) {
 			var charId = "#" + char.id;
-			$(charId).find(".hp").html(char.hp);
-			$(charId).find(".attack").html(char.attack);
-			$(charId).find(".counter-attack").html(char.counterAttack);
+			$(charId).find(".hp span").html(char.hp);
+			$(charId).find(".attack span").html(char.attack);
+			$(charId).find(".counter-attack span").html(char.counterAttack);
 		}
 
 		if (Array.isArray(characters)) {
@@ -205,18 +170,43 @@ $(document).ready(function(){
 		});
 	}
 
-	function stageOpponent(id) {
-		//add class to current opponent
-		$("#" + game.charactersArray[id].id).addClass("fighting");
+	function stageOpponent() {
+		// finds the div for the current enemy and styles it
+		$("#" + game.enemyFighting.id).addClass("fighting");
+		$("#message").empty();
+	}
+	function showMessage(message) {
+		$("#message").html(message);
+	}
+	function showWinGame() {
+		$("#message").append("<br> You defeated everyone!!");
+		$("#reset").addClass("show");
+		$("#attack").addClass("hide");
+	}
+	function showWinBattle(opponent) {
+		$("#message").append("<br>You defeated " + opponent + ". Pick your next opponent!");
+	}
+	function resetDisplay() {
+		$("#" + game.enemyFighting.id).show();
+		$(".character").removeClass("enemy defeated fighting me");
+		$("#reset").removeClass("show");
+		$("#attack").removeClass("hide");
+		$("#message").empty();
 	}
 
 	function handleCharacterClick() {
 		var id = $(this).attr("id");
-
+		id = parseInt(id);
 		if (game.gameStage === 1) {
-			// to do : make sure is not selected character
+			// make sure is not selected character
+			if ( game.playerCharacter.id === id ) {
+				console.log("you can't fight yourself");
+				return false;
+			}
+
+			// sets the opponent
 			game.selectOpponent(id);
-			stageOpponent(id);
+			stageOpponent();
 			game.gameStage = 2;
 		}
 
@@ -229,12 +219,18 @@ $(document).ready(function(){
 	function handleAttack() {
 		game.attack();
 	}
+	function handleReset() {
+		game.reset();
+		updateStats(game.charactersArray);
+	}
 	// events	
 
 	initializeGame();
 
+
 	$(".character").click( handleCharacterClick );
 	$("#attack").click( handleAttack );
+	$("#reset").click( handleReset );
 
 });
 

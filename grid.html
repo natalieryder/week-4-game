@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style>
+		.grid {
+			display: grid;
+			height: 100vh;
+			grid-template-columns: repeat(12, 8.333%);
+ 			grid-template-rows: 33.33% 33.33% 33.33%;
+		}
+		.character {
+			background: red;
+			grid-column-end: span 3;
+		}
+		.enemy {
+			background: blue;
+			grid-column: 4 / span 1;
+  			grid-row: 2 / span 1;
+		}
+		.me {
+			background: green;
+		}
+	</style>
+</head>
+<body>
+	<div class="grid">
+		<div class="character">
+			.
+		</div>
+		<div class="character">
+			.
+		</div>
+		<div class="character enemy">
+
+			.
+		</div>
+		<div class="character me">
+			.
+		</div>
+	</div>
+</body>
+</html>

@@ -1,82 +1,109 @@
-class Game{
-	reset: function() {
-		this.characters = {
-			"5": {
-				id: 0,
-				name: "Ginny Weasley",
-				hp: 120,
-				attack: 8,
-				counterAttack: 10,
-			},
-			"6": {
-				id: 1,
-				name: "Neville Longbottom",
-				hp: 150,
-				attack: 20,
-				counterAttack: 20,
-			},
-			"7": {
-				id: 2,
-				name: "Luna Lovegood",
-				hp: 180,
-				attack: 25,
-				counterAttack: 25,
-			},
-			"8": {
-				id: 3,
-				name: "Colin Creevy",
-				hp: 100,
-				attack: 5,
-				counterAttack: 5,
-			}
-		};
-	},
-	attackCharacter: function(id) {
-		// fetch character with id
+$(document).ready(function(){
+function initializeGame() {
+	//for each character, create their block
+	$.each(game.charactersArray, function(key,value){
+		$("#instructions").html("Choose a character");
+		var characterBlock = $("<div>").attr("id",key).addClass("character");
+		$("<p class='strong mb-0'>").html(value.name).appendTo(characterBlock);
+		$("<img>").attr("src",value.image).addClass("img-fluid").appendTo(characterBlock);
+		var stats = $("<ul>").addClass("stats");
+		var hp = $("<li>").append("<span>").addClass("hp").prepend("Health: ");
+		var attack = $("<li>").append("<span>").addClass("attack").prepend("Attack: ");
+		var counter = $("<li>").append("<span>").addClass("counter-attack").prepend("Counter Attack: ");
+		// $(stats).append(hp).append(attack).append(counter).appendTo(characterBlock);
+		$(stats).append(hp).appendTo(characterBlock);
+		$(characterBlock).appendTo("#characters");
+	});
+	updateStats(game.charactersArray);
+}
 
-		// decrement opponent health
-
-		// decrement my health
-
-		// check for win
-
-		// check for lose
-
-		// return game state
-		return this.getState();
-
-	},
-	selectCharacter: function(id) {
-		// set this.mycharacter = id
-
-		this.myCharacterId = id;
-
-		return this.getState();
-
+function updateStats(characters) {
+	// console.log(array)
+	function printStats(char) {
+		var charId = "#" + char.id;
+		$(charId).find(".hp span").html(char.hp);
+		$(charId).find(".attack span").html(char.attack);
+		$(charId).find(".counter-attack span").html(char.counterAttack);
 	}
-	getState: function() {
 
-		var myCHaracter = this.characters[id];
-		var arrayOfEnemies = [];
-
-		for (var i = 0; i < this.characters.length; i++) {
-			var aCharacter = this.characters[i];
-			if (i == id) {
-				// this is my character
-			} else {
-				// add it to an array of enemies
-			}
-		}
-		return {
-			me: myCharacter,
-			enemies: arrayOfEnemies,
-			win: false,
-			lose: false
-		};
+	if (Array.isArray(characters)) {
+		$.each(characters, function(index, value){
+			printStats(value);
+		});
+	} else {
+		printStats(characters);
 	}
 }
 
-$(document).ready(function() {
-	this.game = new Game();
+function moveCharacters(id) {
+	id = parseInt(id);
+	$("#" + id).addClass("me");
+	var enemies = game.enemies;
+	// for each enemy, add class
+	$.each(enemies, function(key,value) {
+		$("#" + value.id).addClass("enemy");
+	});
+}
 
+function stageOpponent() {
+	// finds the div for the current enemy and styles it
+	$("#" + game.enemyFighting.id).addClass("fighting");
+	$("#message").empty();
+}
+function showMessage(message) {
+	$("#message").html(message);
+}
+function showWinGame() {
+	$("#message").append("<br> You defeated everyone!!");
+	$("#reset").addClass("show");
+	$("#attack").addClass("hide");
+}
+function showWinBattle(opponent) {
+	$("#message").append("<br>You defeated " + opponent + ". Pick your next opponent!");
+}
+function resetDisplay() {
+	$("#" + game.enemyFighting.id).show();
+	$(".character").removeClass("enemy defeated fighting me");
+	$("#reset").removeClass("show");
+	$("#attack").removeClass("hide");
+	$("#message").empty();
+}
+
+function handleCharacterClick() {
+	var id = $(this).attr("id");
+	id = parseInt(id);
+	if (game.gameStage === 1) {
+		// make sure is not selected character
+		if ( game.playerCharacter.id === id ) {
+			console.log("you can't fight yourself");
+			return false;
+		}
+
+		// sets the opponent
+		game.selectOpponent(id);
+		stageOpponent();
+		game.gameStage = 2;
+	}
+
+	if (game.gameStage === 0) {
+		game.selectCharacter(id);
+		moveCharacters(id);
+		game.gameStage = 1;
+	}
+}
+function handleAttack() {
+	game.attack();
+}
+function handleReset() {
+	game.reset();
+	updateStats(game.charactersArray);
+}
+// events	
+
+initializeGame();
+
+
+$(".character").click( handleCharacterClick );
+$("#attack").click( handleAttack );
+$("#reset").click( handleReset );
 });

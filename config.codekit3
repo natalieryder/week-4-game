@@ -224,6 +224,12 @@
 		"oS": 0,
 		"uL": 1
 		},
+	"\/grid.html": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/grid.html",
+		"oF": 0
+		},
 	"\/index.html": {
 		"ft": 8192,
 		"oA": 2,
