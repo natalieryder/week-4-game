@@ -91,6 +91,8 @@ $(document).ready(function(){
 				}
 				//return a message, the enemies array, and the current player
 				return ["Your hit " + thisGame.enemyFighting.name + " for -" + youHit + "<br>" + thisGame.enemyFighting.name + " hit you for -" + theyHit,thisGame.enemies,thisGame.playerCharacter];
+			} else {
+				return ["select a new opponent"];
 			}
 		},
 		win: function() {
@@ -103,13 +105,16 @@ $(document).ready(function(){
 				}
 				totalhp += value.hp;
 			});
-			
+			game.gameStage = 1;
 			if (totalhp <= 0) {
 				endGame("You defeated everyone!");
+				return true
 			} else {
 				showWinBattle(this.enemyFighting.name);
+				console.log(this.enemyFighting.name);
+				return false
 			}
-			game.gameStage = 1;
+			
 		},
 		lose: function() {
 			endGame("You Lost");
@@ -148,11 +153,15 @@ $(document).ready(function(){
 		}
 	}
 	function handleAttack() {
+		$("#message").empty();
 		var attack = game.attack();
-		console.log(attack);
+		
+		// console.log(attack);
 		showMessage(attack[0]);
-		updateStats(attack[1]);
-		updateStats(attack[2]);
+		if (attack.length > 1) {
+			updateStats(attack[1]);
+			updateStats(attack[2]);
+		}
 	}
 	function handleReset() {
 		game.reset();
@@ -216,7 +225,7 @@ $(document).ready(function(){
 	}
 
 	function showMessage(message) {
-		$("#message").html(message);
+		$("#message").append(message);
 	}
 
 	function endGame(message) {
