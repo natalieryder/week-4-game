@@ -11,28 +11,28 @@ $(document).ready(function(){
 			},
 			{
 				name: "Neville Longbottom",
-				hp: 150,
+				hp: 140,
 				attack: 20,
-				counterAttack: 15,
+				counterAttack: 12,
 				image: "./assets/images/neville.jpg",
 				id: 1
 			},
 			{
 				name: "Luna Lovegood",
-				hp: 180,
-				attack: 25,
+				hp: 170,
+				attack: 15,
 				counterAttack: 15,
 				image: "./assets/images/luna.jpg",
 				id: 2
 			},
 			{
 				name: "Colin Creevy",
-				hp: 100,
+				hp: 115,
 				attack: 10,
 				counterAttack: 5,
 				image: "./assets/images/colin.jpg",
 				id: 3
-			}
+			},
 		],
 		gameStage: 0,
 		playerCharacter:{},
@@ -40,26 +40,27 @@ $(document).ready(function(){
 		enemyFighting:'',
 		
 		selectCharacter: function(id) { 
-			// checks each character against the id of the one clicked and sorts them
-			// id = parseInt(id);
+			// checks each character against the id of the one clicked and sorts them into enemies and player character
 			var thisGame = this;
 			var enemies = [];
-			var playerCharacterNew;
+			var playerCharacter;
 			$.each(this.charactersArray, function(key,value){
 				if (key === id) {
-					playerCharacterNew = $.extend(true,{},thisGame.charactersArray[key]);
+					playerCharacter = $.extend(true,{},thisGame.charactersArray[key]);
 				} else {
 					enemies.push($.extend(true,{},thisGame.charactersArray[key]));
-				};
+				}
 			});
 
-			this.playerCharacter = playerCharacterNew;
+			this.playerCharacter = playerCharacter;
 			this.enemies = enemies;
+			//move to get oppononent stage
+			game.gameStage = 1;
 		},
 
 		selectOpponent: function(id) {
 			// id = parseInt(id);
-			thisGame = this;
+			var thisGame = this;
 			
 			$.each(thisGame.enemies, function(index,value){
 				
@@ -67,9 +68,11 @@ $(document).ready(function(){
 					thisGame.enemyFighting = value;
 				}
 			});
+			//move to attack stage
+			game.gameStage = 2;
 		},
 		attack: function() {
-			var thisGame = this; //not sure why this doesn't work here
+			var thisGame = this; 
 			if (thisGame.gameStage === 2) {
 				var youHit = thisGame.playerCharacter.attack;
 				var theyHit = thisGame.enemyFighting.counterAttack;
@@ -78,20 +81,19 @@ $(document).ready(function(){
 				//increase the attack power
 				thisGame.playerCharacter.attack += thisGame.charactersArray[thisGame.playerCharacter.id].attack;
 				// thisGame.enemies[thisGame.enemyFighting.id] = thisGame.enemyFighting;
-				showMessage("Your hit " + thisGame.enemyFighting.name + " for -" + youHit + "<br>" + thisGame.enemyFighting.name + " hit you for -" + theyHit);
+				// showMessage("Your hit " + thisGame.enemyFighting.name + " for -" + youHit + "<br>" + thisGame.enemyFighting.name + " hit you for -" + theyHit);
 				if (thisGame.enemyFighting.hp <= 0) {
 					this.win();
-				};
+				}
 
 				if (thisGame.playerCharacter.hp <= 0) {
 					this.lose();
-				};
-				updateStats(thisGame.enemies);
-				updateStats(thisGame.playerCharacter);
+				}
+				//return a message, the enemies array, and the current player
+				return ["Your hit " + thisGame.enemyFighting.name + " for -" + youHit + "<br>" + thisGame.enemyFighting.name + " hit you for -" + theyHit,thisGame.enemies,thisGame.playerCharacter];
 			}
 		},
 		win: function() {
-
 			$("#" + game.enemyFighting.id).addClass("defeated").removeClass("fighting");
 			//if the character has health 0
 			var totalhp = 0;
@@ -103,15 +105,14 @@ $(document).ready(function(){
 			});
 			
 			if (totalhp <= 0) {
-				showWinGame();
+				endGame("You defeated everyone!");
 			} else {
 				showWinBattle(this.enemyFighting.name);
 			}
 			game.gameStage = 1;
 		},
 		lose: function() {
-			console.log("you lose");
-			game.reset();
+			endGame("You Lost");
 		},
 		reset: function() {
 			game.gameStage = 0;
@@ -121,7 +122,47 @@ $(document).ready(function(){
 			resetDisplay();
 		}
 	};
+	//end of game object
 
+
+	function handleCharacterClick() {
+		var id = $(this).attr("id");
+		id = parseInt(id);
+		if (game.gameStage === 0) {
+			game.selectCharacter(id);
+			//assigns classes based on the characters
+			moveCharacters(id);
+			return;
+		}
+
+		if (game.gameStage === 1) {
+			// make sure is not selected character
+			if ( game.playerCharacter.id === id ) {
+				$("#message").html("you can't fight yourself");
+				return false;
+			}
+			// sets the opponent
+			game.selectOpponent(id);
+			stageOpponent();
+			return;
+		}
+	}
+	function handleAttack() {
+		var attack = game.attack();
+		console.log(attack);
+		showMessage(attack[0]);
+		updateStats(attack[1]);
+		updateStats(attack[2]);
+	}
+	function handleReset() {
+		game.reset();
+		//pass the original array into updateStats 
+		updateStats(game.charactersArray);
+	}
+
+	// Purely for display
+
+	//set up the basic container for each box
 	function initializeGame() {
 		//for each character, create their block
 		$.each(game.charactersArray, function(key,value){
@@ -139,16 +180,15 @@ $(document).ready(function(){
 		});
 		updateStats(game.charactersArray);
 	}
-
+	//update the stats with the characterArray
 	function updateStats(characters) {
-		// console.log(array)
+
 		function printStats(char) {
 			var charId = "#" + char.id;
 			$(charId).find(".hp span").html(char.hp);
 			$(charId).find(".attack span").html(char.attack);
 			$(charId).find(".counter-attack span").html(char.counterAttack);
 		}
-
 		if (Array.isArray(characters)) {
 			$.each(characters, function(index, value){
 				printStats(value);
@@ -159,74 +199,50 @@ $(document).ready(function(){
 	}
 
 	function moveCharacters(id) {
-		id = parseInt(id);
-
 		$("#" + id).addClass("me");
-
 		var enemies = game.enemies;
 		// for each enemy, add class
 		$.each(enemies, function(key,value) {
 			$("#" + value.id).addClass("enemy");
 		});
+		$("#instructions").html("Choose opponent");
 	}
 
 	function stageOpponent() {
 		// finds the div for the current enemy and styles it
 		$("#" + game.enemyFighting.id).addClass("fighting");
 		$("#message").empty();
+		$("#instructions").html("Attack!");
 	}
+
 	function showMessage(message) {
 		$("#message").html(message);
 	}
-	function showWinGame() {
-		$("#message").append("<br> You defeated everyone!!");
+
+	function endGame(message) {
+		$("#message").append("<br> " + message);
+		$("#instructions").html(message);
 		$("#reset").addClass("show");
 		$("#attack").addClass("hide");
 	}
+
 	function showWinBattle(opponent) {
 		$("#message").append("<br>You defeated " + opponent + ". Pick your next opponent!");
+		$("#instructions").html("Choose opponent");
 	}
+
 	function resetDisplay() {
-		$("#" + game.enemyFighting.id).show();
+		$("#instructions").html("Choose a character");
 		$(".character").removeClass("enemy defeated fighting me");
 		$("#reset").removeClass("show");
 		$("#attack").removeClass("hide");
 		$("#message").empty();
 	}
 
-	function handleCharacterClick() {
-		var id = $(this).attr("id");
-		id = parseInt(id);
-		if (game.gameStage === 1) {
-			// make sure is not selected character
-			if ( game.playerCharacter.id === id ) {
-				console.log("you can't fight yourself");
-				return false;
-			}
-
-			// sets the opponent
-			game.selectOpponent(id);
-			stageOpponent();
-			game.gameStage = 2;
-		}
-
-		if (game.gameStage === 0) {
-			game.selectCharacter(id);
-			moveCharacters(id);
-			game.gameStage = 1;
-		}
-	}
-	function handleAttack() {
-		game.attack();
-	}
-	function handleReset() {
-		game.reset();
-		updateStats(game.charactersArray);
-	}
 	// events	
 
 	initializeGame();
-
+	console.log("hi");
 
 	$(".character").click( handleCharacterClick );
 	$("#attack").click( handleAttack );
