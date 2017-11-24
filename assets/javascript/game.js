@@ -130,7 +130,6 @@ $(document).ready(function(){
 			} else {
 				return false
 			}
-			
 		},
 
 		reset: function() {
