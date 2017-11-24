@@ -9,6 +9,12 @@
 	],
 "creatorBuild": "25428",
 "files": {
+	"\/.gitignore": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/.gitignore",
+		"oF": 0
+		},
 	"\/assets\/bootstrap\/css\/bootstrap-grid.css": {
 		"aP": 0,
 		"bl": 0,
@@ -202,11 +208,11 @@
 		"sC": 1,
 		"tS": 0
 		},
-	"\/assets\/javascript\/page.js": {
+	"\/assets\/javascript\/min\/page-min.js": {
 		"ft": 64,
 		"mi": 1,
 		"oA": 0,
-		"oAP": "\/assets\/javascript\/min\/page-min.js",
+		"oAP": "\/assets\/javascript\/min\/min\/page-min-min.js",
 		"oF": 0,
 		"sC": 1,
 		"tS": 0
@@ -224,22 +230,10 @@
 		"oS": 0,
 		"uL": 1
 		},
-	"\/grid.html": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/grid.html",
-		"oF": 0
-		},
 	"\/index.html": {
 		"ft": 8192,
 		"oA": 2,
 		"oAP": "\/index.html",
-		"oF": 0
-		},
-	"\/index2.html": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/index2.html",
 		"oF": 0
 		},
 	"\/README.md": {
