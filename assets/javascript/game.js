@@ -4,23 +4,23 @@ $(document).ready(function(){
 			{
 				name: "Ginny Weasley",
 				hp: 120,
-				attack: 15,
-				counterAttack: 8,
+				attack: 12,
+				counterAttack: 15,
 				image: "./assets/images/ginny.jpg",
 				id: 0
 			},
 			{
 				name: "Neville Longbottom",
-				hp: 140,
-				attack: 20,
+				hp: 130,
+				attack: 14,
 				counterAttack: 12,
 				image: "./assets/images/neville.jpg",
 				id: 1
 			},
 			{
 				name: "Luna Lovegood",
-				hp: 170,
-				attack: 15,
+				hp: 150,
+				attack: 10,
 				counterAttack: 15,
 				image: "./assets/images/luna.jpg",
 				id: 2
@@ -29,7 +29,7 @@ $(document).ready(function(){
 				name: "Colin Creevy",
 				hp: 115,
 				attack: 10,
-				counterAttack: 5,
+				counterAttack: 10,
 				image: "./assets/images/colin.jpg",
 				id: 3
 			},
@@ -55,7 +55,7 @@ $(document).ready(function(){
 			this.playerCharacter = playerCharacter;
 			this.enemies = enemies;
 			//move to get oppononent stage
-			game.gameStage = 1;
+			thisGame.gameStage = 1;
 		},
 
 		selectOpponent: function(id) {
@@ -69,62 +69,76 @@ $(document).ready(function(){
 				}
 			});
 			//move to attack stage
-			game.gameStage = 2;
+			thisGame.gameStage = 2;
 		},
 		attack: function() {
 			var thisGame = this; 
+			var result = {};
 			if (thisGame.gameStage === 2) {
 				var youHit = thisGame.playerCharacter.attack;
 				var theyHit = thisGame.enemyFighting.counterAttack;
 				thisGame.enemyFighting.hp -= youHit;
 				thisGame.playerCharacter.hp -= theyHit;
+
 				//increase the attack power
 				thisGame.playerCharacter.attack += thisGame.charactersArray[thisGame.playerCharacter.id].attack;
-				// thisGame.enemies[thisGame.enemyFighting.id] = thisGame.enemyFighting;
-				// showMessage("Your hit " + thisGame.enemyFighting.name + " for -" + youHit + "<br>" + thisGame.enemyFighting.name + " hit you for -" + theyHit);
-				if (thisGame.enemyFighting.hp <= 0) {
-					this.win();
-				}
 
+				// if the enemy loses, this.win returns whether player has defeated everyone or just the current opponent
+				if (thisGame.enemyFighting.hp <= 0) {
+					if (this.win()) {
+						result.won = 'war';
+					} else {
+						result.won = 'battle';
+					}
+				}
 				if (thisGame.playerCharacter.hp <= 0) {
-					this.lose();
+					result.won = "lost";
 				}
 				//return a message, the enemies array, and the current player
-				return ["Your hit " + thisGame.enemyFighting.name + " for -" + youHit + "<br>" + thisGame.enemyFighting.name + " hit you for -" + theyHit,thisGame.enemies,thisGame.playerCharacter];
+				result.message = "You hit " + thisGame.enemyFighting.name + " for -" + youHit + "<br>" + thisGame.enemyFighting.name + " hit you for -" + theyHit;
+				// maybe return an array of all the things to update
+				// result.charsToUpdate [thisGame.enemies, thisGame.playerCharacter];
+
 			} else {
-				return ["select a new opponent"];
+				result.message = ["Select a new opponent."];
 			}
+			result.enemies = thisGame.enemies;
+			result.character = thisGame.playerCharacter;
+			console.log("the result is")
+			console.log(result);
+			return result;
+							
 		},
 		win: function() {
-			$("#" + game.enemyFighting.id).addClass("defeated").removeClass("fighting");
-			//if the character has health 0
+			var thisGame = this;
+			$("#" + thisGame.enemyFighting.id).addClass("defeated").removeClass("fighting");
+
 			var totalhp = 0;
-			$.each(game.enemies, function(key, value) {
+			$.each(thisGame.enemies, function(key, value) {
 				if (value.hp < 0) {
+					//if hp is less than 0 set to 0
 					value.hp = 0;
 				}
 				totalhp += value.hp;
 			});
-			game.gameStage = 1;
+
+			thisGame.gameStage = 1;
+
+			//if total of all enemies hp is 0, you've won
 			if (totalhp <= 0) {
-				endGame("You defeated everyone!");
 				return true
 			} else {
-				showWinBattle(this.enemyFighting.name);
-				console.log(this.enemyFighting.name);
 				return false
 			}
 			
 		},
-		lose: function() {
-			endGame("You Lost");
-		},
+
 		reset: function() {
 			game.gameStage = 0;
 			game.playerCharacter = '';
 			game.enemies = [];
 			game.enemyFighting = '';
-			resetDisplay();
+			return(this.charactersArray);
 		}
 	};
 	//end of game object
@@ -155,18 +169,35 @@ $(document).ready(function(){
 	function handleAttack() {
 		$("#message").empty();
 		var attack = game.attack();
-		
-		// console.log(attack);
-		showMessage(attack[0]);
-		if (attack.length > 1) {
-			updateStats(attack[1]);
-			updateStats(attack[2]);
+		/* game.attack returns {
+			won: (war,battle,lost)
+			message: (the message to show)
+			enemies: (the array of enemies)
+			character: (the character object)
 		}
+		*/
+		
+		if (attack.won === "war") {
+			endGame("You defeated everyone!");
+		}
+		if (attack.won === "battle") {
+			console.log(game.enemyFighting);
+			console.log(this.enemyFighting);
+			showWinBattle(game.enemyFighting.name);
+		}
+		if (attack.won === "lost") {
+			endGame("You Lost");
+		}
+		showMessage(attack.message);
+		updateStats(attack.enemies);
+		updateStats(attack.character);
+		
 	}
 	function handleReset() {
-		game.reset();
+
 		//pass the original array into updateStats 
-		updateStats(game.charactersArray);
+		updateStats(game.reset());
+		resetDisplay();
 	}
 
 	// Purely for display
@@ -177,14 +208,15 @@ $(document).ready(function(){
 		$.each(game.charactersArray, function(key,value){
 			$("#instructions").html("Choose a character");
 			var characterBlock = $("<div>").attr("id",key).addClass("character");
-			$("<p class='strong mb-0'>").html(value.name).appendTo(characterBlock);
-			$("<img>").attr("src",value.image).addClass("img-fluid").appendTo(characterBlock);
+			var characterBlockContainer = $("<div>").addClass("inside").appendTo(characterBlock);
+			$("<p class='strong mb-0'>").html(value.name).appendTo(characterBlockContainer);
+			$("<img>").attr("src",value.image).addClass("img-fluid").appendTo(characterBlockContainer);
 			var stats = $("<ul>").addClass("stats");
 			var hp = $("<li>").append("<span>").addClass("hp").prepend("Health: ");
-			var attack = $("<li>").append("<span>").addClass("attack").prepend("Attack: ");
-			var counter = $("<li>").append("<span>").addClass("counter-attack").prepend("Counter Attack: ");
+			// var attack = $("<li>").append("<span>").addClass("attack").prepend("Attack: ");
+			// var counter = $("<li>").append("<span>").addClass("counter-attack").prepend("Counter Attack: ");
 			// $(stats).append(hp).append(attack).append(counter).appendTo(characterBlock);
-			$(stats).append(hp).appendTo(characterBlock);
+			$(stats).append(hp).appendTo(characterBlockContainer);
 			$(characterBlock).appendTo("#characters");
 		});
 		updateStats(game.charactersArray);
@@ -225,7 +257,7 @@ $(document).ready(function(){
 	}
 
 	function showMessage(message) {
-		$("#message").append(message);
+		$("#message").prepend(message);
 	}
 
 	function endGame(message) {

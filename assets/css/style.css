@@ -18,57 +18,90 @@ h1 {
 #characters {
   display: grid;
   grid-auto-flow: row;
-  height: 400px;
+  height: auto;
   grid-template-columns: repeat(12, 8.3333%);
-  grid-template-rows: 45% 10% 45%;
+  grid-template-rows: auto auto auto auto;
   align-content: center; }
 
 .character {
-  grid-column-end: span 3;
+  grid-column-end: span 6;
   text-align: center;
   align-self: center;
-  display: block; }
+  display: block;
+  margin: 10px;
+  cursor: pointer;
+  height: 100%; }
+  .character .inside {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white; }
+  .character ul li span {
+    font-weight: bold; }
 
 .character img {
-  height: 100px; }
+  height: 100px;
+  margin: 10px; }
 
 .player {
   background: green; }
 
-.enemy {
-  bottom: 0;
+.enemy .inside {
   border: 1px solid red; }
 
 .me {
-  grid-column: 2 / span 3;
-  grid-row: 3 / span 1;
-  border: 1px solid green; }
+  grid-column: 1 / span 6;
+  grid-row: 4 / span 1; }
   .me:before {
-    content: "Me:"; }
+    content: "Me";
+    font-size: 24px;
+    color: green; }
+  .me .inside {
+    border: 1px solid green; }
 
 .container {
   height: 100%; }
 
 .fighting {
-  grid-column: 9 / span 3;
-  grid-row: 3 / span 1; }
+  grid-column: 8 / span 6;
+  grid-row: 4 / span 1; }
   .fighting:before {
-    content: "Current opponent:"; }
+    content: "Defender";
+    font-size: 24px;
+    color: red; }
 
 .defeated {
   display: none; }
 
 #messages {
   text-align: center;
-  grid-column: 5 / span 4;
+  grid-column: 4 / span 6;
   grid-row: 3 / span 1;
   justify-self: center;
-  align-self: center; }
+  align-self: center;
+  align-items: center; }
 
 #reset {
   display: none; }
   #reset.show {
     display: inline-block; }
 
-#attack.hide {
-  display: none; }
+#attack {
+  margin: 10px;
+  cursor: pointer; }
+  #attack.hide {
+    display: none; }
+
+@media screen and (min-width: 768px) {
+  #characters {
+    grid-template-rows: auto 50px auto; }
+  .character {
+    grid-column-end: span 3; }
+  .me {
+    grid-column: 2 / span 3;
+    grid-row: 3 / span 1; }
+  .fighting {
+    grid-column: 9 / span 3;
+    grid-row: 3 / span 1; }
+  #messages {
+    grid-column: 5 / span 4; } }
